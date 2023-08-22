@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
+
+* {
+  box-sizing: border-box;
+  --color1: #D9CAB3;
+  --color2: #8C7A6B;
+  --color3: #BC8034;
+  --color4: #90323D;
+  --color5: #5E0B15;
+  font-family: 'Secular One', sans-serif;
+}
+
+html {
+  font-family: 'Secular One', sans-serif;
+}
+
+body {
+  height: 100vh;
+  background-color: var(--color4);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+h1 {
+  color: var(--color1);
+  font-size: 4rem;
+}
+
+.wrapper {
+  display: flex;
+  border-radius: 3px;
+  justify-content: center;
+  background-color: var(--color5);
+  padding: 50px;
+  gap: 75px;
+}
+
+button,
+.button-container,
+.etch-pad,
+.etch-a-sketch {
+  border-radius: 3px;
+  box-shadow: 0px 0px 5px 1px;
+}
+
+button {
+  background-color: var(--color4);
+  border: none;
+  font-size: 1rem;
+  color: var(--color1);
+  /* box-shadow: 0px 0px 1px 1px; */
+
+}
+
+button:hover {
+  background-color: var(--color2);
+  box-shadow: 0px 0px 3px 1px var(--color1)
+  
+}
+
+.button-container {
+  padding: 30px;
+  background-color: var(--color2);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border: 4px solid var(--color1);
+}
+
+.etch-pad {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  background-color: var(--color2);
+  height: 600px;
+  aspect-ratio: 1/1;
+  box-shadow: 0px 0px 10px 1px;
+  /* margin: -30px; */
+}
+
+.etch-a-sketch {
+  background-color: var(--color1);
+  height: 94%;
+  display: flex;
+  flex-wrap: wrap;
+  aspect-ratio: 1/1;
+}
+
+.etch-a-sketch .sq {
+  aspect-ratio: 1/1;
+  transition: background-color 150ms ease-out;
+  background-color: inherit;
+}
+
+.etch-a-sketch .sq.highlight-bw {
+  background-color: white;
+}
+
+.etch-a-sketch .sq.highlight-single-color {
+  background-color: rgb(0, 149, 248);
+}
+
+.mouse-trails.active {
+  background-color: var(--color3)
+}
+
+button.set-grid {
+  margin-top: auto;
+}
