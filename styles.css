@@ -4,7 +4,7 @@
   box-sizing: border-box;
   --color1: #D9CAB3;
   --color2: #8C7A6B;
-  --color3: #BC8034;
+  --color3: #007369;
   --color4: #90323D;
   --color5: #5E0B15;
   font-family: 'Secular One', sans-serif;
@@ -40,6 +40,7 @@ h1 {
 
 button,
 .button-container,
+.button-container .selected-color,
 .etch-pad,
 .etch-a-sketch {
   border-radius: 3px;
@@ -51,14 +52,11 @@ button {
   border: none;
   font-size: 1rem;
   color: var(--color1);
-  /* box-shadow: 0px 0px 1px 1px; */
-
 }
 
 button:hover {
   background-color: var(--color2);
   box-shadow: 0px 0px 3px 1px var(--color1)
-  
 }
 
 .button-container {
@@ -78,12 +76,9 @@ button:hover {
   background-color: var(--color2);
   height: 600px;
   aspect-ratio: 1/1;
-  box-shadow: 0px 0px 10px 1px;
-  /* margin: -30px; */
 }
 
 .etch-a-sketch {
-  background-color: var(--color1);
   height: 94%;
   display: flex;
   flex-wrap: wrap;
@@ -96,18 +91,25 @@ button:hover {
   background-color: inherit;
 }
 
-.etch-a-sketch .sq.highlight-bw {
-  background-color: white;
-}
-
-.etch-a-sketch .sq.highlight-single-color {
-  background-color: rgb(0, 149, 248);
-}
-
-.mouse-trails.active {
+.button-container .active {
   background-color: var(--color3)
 }
 
 button.set-grid {
   margin-top: auto;
 }
+
+.color-pickers {
+  display: flex;
+  gap: 4px;
+}
+
+.color-pickers .color {
+  flex: 1;
+  height: 23.5px;
+  border-radius: 3px;
+  box-shadow: 0px 0px 5px 1px var(--color1);
+  background-color: var(--color4);
+  border: 0px solid var(--color1);
+}
+
