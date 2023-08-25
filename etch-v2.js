@@ -45,7 +45,6 @@ function updateBgColor() {
 };
 
 function toggleMouseTrailsMode() {
-  // clearGrid();
   mouseTrails === false ? mouseTrails = true : mouseTrails = false;
   squares.forEach((sq) => sq.setAttribute('data-prev-color', sq.style.backgroundColor));
   this.classList.toggle('active')
@@ -188,8 +187,6 @@ function colorOut() {
     }, 200);
   };
 }
-
-// add has-changed if the color is drawn, darkened, or lightened without mouse trails
  
 function setSingleColorDraw() {
   resetEventListeners()
