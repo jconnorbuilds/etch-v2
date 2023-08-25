@@ -27,7 +27,8 @@ darkenBtn.addEventListener('click', setDarken);
 clearBtn.addEventListener('click', clearGrid);
 setGridBtn.addEventListener('click', setGridSize)
 colorPickerDraw.addEventListener('input', () => selectedDrawColor = colorPickerDraw.value);
-colorPickerBg.addEventListener('change', updateBgColor);
+colorPickerDraw.addEventListener('change', setSingleColorDraw);
+colorPickerBg.addEventListener('input', updateBgColor);
 
 function updateBgColor() {
   selectedBgColor = colorPickerBg.value;
@@ -39,9 +40,9 @@ function updateBgColor() {
 };
 
 function toggleMouseTrailsMode() {
-  clearGrid();
+  // clearGrid();
   mouseTrails === false ? mouseTrails = true : mouseTrails = false;
-  mouseTrailsBtn.classList.toggle('active')
+  this.classList.toggle('active')
 }
 
 function clearGrid() {
@@ -75,6 +76,12 @@ function setGridSize() {
   createGrid(gridSize)
 };
 
+function setActiveStyle(btn) {
+  const buttons = document.querySelectorAll('.button-container .selfish');
+  buttons.forEach((button) => button.classList.remove('active'))
+  btn.classList.add('active')
+}
+
 function getRandomRGB() {
   // returns a randomly generated RGB value in format: rgb(0 0 255)
   let r = Math.floor(Math.random() * 256);
@@ -106,7 +113,7 @@ function lighten(e) {
     currentColor[0] === '#' ? currentColorRGB = hexToRGB(currentColor) : currentColorRGB = parseRGBValues(currentColor);
 
     for (value of currentColorRGB) {
-      if (value < 5) value; // values less than 5 are unaffected by multiplying by 1.1
+      if (value < 5) value++; // values less than 5 are unaffected by multiplying by 1.1
       newRGBValues.push(value * 1.1);
     };
     this.style.backgroundColor = `rgb(${newRGBValues.join(' ')})`
@@ -168,6 +175,7 @@ function setSingleColorDraw() {
   squares.forEach((sq) => sq.addEventListener('mousedown', singleColorIn));
   squares.forEach((sq) => sq.addEventListener('mouseover', singleColorIn));
   squares.forEach((sq) => sq.addEventListener('mouseout', colorOut));
+  setActiveStyle(singleColorDrawBtn)
 }
 
 function setMultiColorDraw() {
@@ -175,18 +183,23 @@ function setMultiColorDraw() {
   squares.forEach((sq) => sq.addEventListener('mousedown', multiColorIn));
   squares.forEach((sq) => sq.addEventListener('mouseover', multiColorIn));
   squares.forEach((sq) => sq.addEventListener('mouseout', colorOut));
+  setActiveStyle(multiColorDrawBtn)
 };
 
 function setLighten() {
   resetEventListeners()
   squares.forEach((sq) => sq.addEventListener('mousedown', lighten));
   squares.forEach((sq) => sq.addEventListener('mouseover', lighten));
+  squares.forEach((sq) => sq.addEventListener('mouseout', colorOut));
+  setActiveStyle(lightenBtn)
 }
 
 function setDarken() {
   resetEventListeners()
   squares.forEach((sq) => sq.addEventListener('mousedown', darken));
   squares.forEach((sq) => sq.addEventListener('mouseover', darken));
+  squares.forEach((sq) => sq.addEventListener('mouseout', colorOut));
+  setActiveStyle(darkenBtn)
 }
 
 createGrid();
