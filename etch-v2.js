@@ -9,6 +9,7 @@ const colorPickerDraw = document.querySelector('.color-pickers .color-main')
 const colorPickerBg = document.querySelector('.color-pickers .color-bg')
 const lightenBtn = document.querySelector('.button-container .lighten')
 const darkenBtn = document.querySelector('.button-container .darken')
+const eraserBtn = document.querySelector('.button-container .eraser')
 
 let squares; 
 let mouseTrails = false;
@@ -25,16 +26,20 @@ mouseTrailsBtn.addEventListener('click', toggleMouseTrailsMode);
 lightenBtn.addEventListener('click', setLighten);
 darkenBtn.addEventListener('click', setDarken);
 clearBtn.addEventListener('click', clearGrid);
+eraserBtn.addEventListener('click', setEraser);
 setGridBtn.addEventListener('click', setGridSize)
 colorPickerDraw.addEventListener('input', () => selectedDrawColor = colorPickerDraw.value);
 colorPickerDraw.addEventListener('change', setSingleColorDraw);
 colorPickerBg.addEventListener('input', updateBgColor);
 
+
+
 function updateBgColor() {
   selectedBgColor = colorPickerBg.value;
   squares.forEach((sq) => {
-    if (!(sq.classList.contains('colored'))) {
+    if (!(sq.classList.contains('has-changed'))) {
       sq.style.backgroundColor = selectedBgColor;
+      sq.dataset.prevColor = selectedBgColor;
     };
   });
 };
@@ -42,13 +47,15 @@ function updateBgColor() {
 function toggleMouseTrailsMode() {
   // clearGrid();
   mouseTrails === false ? mouseTrails = true : mouseTrails = false;
+  squares.forEach((sq) => sq.setAttribute('data-prev-color', sq.style.backgroundColor));
   this.classList.toggle('active')
-}
+};
 
 function clearGrid() {
   squares.forEach((sq) => sq.style.backgroundColor = selectedBgColor);
-  squares.forEach((sq) => sq.classList.remove('colored'));
-}
+  squares.forEach((sq) => sq.setAttribute('data-prev-color', selectedBgColor));
+  squares.forEach((sq) => sq.classList.remove('has-changed'));
+};
 
 function createGrid(width=24) {
   const size = width*width;
@@ -57,6 +64,7 @@ function createGrid(width=24) {
     gridSquare.classList.add('sq')
     gridSquare.style.width = `${100 / width}%`;
     gridSquare.style.backgroundColor = selectedBgColor;
+    gridSquare.setAttribute('data-prev-color', selectedBgColor);
     etchASketch.appendChild(gridSquare);
     
   }
@@ -67,8 +75,8 @@ function createGrid(width=24) {
 function setGridSize() {
   let gridSize = 0;
   do {
-    gridSize = parseInt(prompt('Set the grid size (Course (1) -> Fine(100)'));
-  } while (!(gridSize > 1 && gridSize <= 100));
+    gridSize = parseInt(prompt('Set the grid size (Course (2) -> Fine(64)'));
+  } while (!(gridSize >= 2 && gridSize <= 64));
 
   while (etchASketch.childNodes.length > 0) {
     etchASketch.removeChild(etchASketch.firstChild)
@@ -83,10 +91,12 @@ function setActiveStyle(btn) {
 }
 
 function getRandomRGB() {
+  let max = 256;
+  let min = 100;
   // returns a randomly generated RGB value in format: rgb(0 0 255)
-  let r = Math.floor(Math.random() * 256);
-  let g = Math.floor(Math.random() * 256);
-  let b = Math.floor(Math.random() * 256);
+  let r = Math.floor(Math.random() * (max - min) + min);
+  let g = Math.floor(Math.random() * (max - min) + min);
+  let b = Math.floor(Math.random() * (max - min) + min);
   let result = `rgb(${[r, g, b].join(' ') })`
   return result;
 };
@@ -113,8 +123,8 @@ function lighten(e) {
     currentColor[0] === '#' ? currentColorRGB = hexToRGB(currentColor) : currentColorRGB = parseRGBValues(currentColor);
 
     for (value of currentColorRGB) {
-      if (value < 5) value++; // values less than 5 are unaffected by multiplying by 1.1
-      newRGBValues.push(value * 1.1);
+      if (value < 10) value += 10;
+      value >= 50 ? newRGBValues.push(value * 1.1) : newRGBValues.push(value * 1.75)
     };
     this.style.backgroundColor = `rgb(${newRGBValues.join(' ')})`
   };
@@ -129,9 +139,17 @@ function darken(e) {
 
     for (value of currentColorRGB) {
       if (value < 6) value--; // values less than 6 are unaffected by multiplying by 0.9
-      newRGBValues.push(value * 0.9);
+      value <= 60 ? newRGBValues.push(value * 0.75) : newRGBValues.push(value * 0.9)
     };
     this.style.backgroundColor = `rgb(${newRGBValues.join(' ')})`
+  };
+}
+
+function erase(e) {
+  if (mousedown || e.type === "mousedown") {
+    this.style.backgroundColor = selectedBgColor;
+    this.dataset.prevColor = selectedBgColor;
+    this.classList.remove('has-changed');
   };
 }
 
@@ -145,30 +163,33 @@ function resetEventListeners() {
   squares.forEach((sq) => sq.removeEventListener('mouseover', lighten));
   squares.forEach((sq) => sq.removeEventListener('mousedown', darken));
   squares.forEach((sq) => sq.removeEventListener('mouseover', darken));
+  squares.forEach((sq) => sq.removeEventListener('mousedown', erase));
+  squares.forEach((sq) => sq.removeEventListener('mouseover', erase));
 }
 
 function singleColorIn(e) {
   if (mousedown || e.type === "mousedown") {
     this.style.backgroundColor = selectedDrawColor;
-    this.classList.add('colored')
+    if (!mouseTrails) this.classList.add('has-changed');
   };
 }
 
 function multiColorIn(e) {
   if (mousedown || e.type === "mousedown") {
     this.style.backgroundColor = getRandomRGB();
-    this.classList.add('colored')
+    if (!mouseTrails) this.classList.add('has-changed');
   };
 }
 
 function colorOut() {
   if (mouseTrails) {
     setTimeout(() => {
-      this.style.backgroundColor = selectedBgColor;
-      this.classList.remove('colored');
+      this.style.backgroundColor = this.dataset.prevColor;
     }, 200);
   };
 }
+
+// add has-changed if the color is drawn, darkened, or lightened without mouse trails
  
 function setSingleColorDraw() {
   resetEventListeners()
@@ -199,7 +220,13 @@ function setDarken() {
   squares.forEach((sq) => sq.addEventListener('mousedown', darken));
   squares.forEach((sq) => sq.addEventListener('mouseover', darken));
   squares.forEach((sq) => sq.addEventListener('mouseout', colorOut));
-  setActiveStyle(darkenBtn)
+  setActiveStyle(darkenBtn);
+}
+
+function setEraser() {
+  squares.forEach((sq) => sq.addEventListener('mousedown', erase));
+  squares.forEach((sq) => sq.addEventListener('mouseover', erase));
+  setActiveStyle(eraserBtn);
 }
 
 createGrid();
