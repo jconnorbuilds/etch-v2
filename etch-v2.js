@@ -39,11 +39,10 @@ colorPickerBg.addEventListener('input', updateBgColor);
 colorSlider.addEventListener('input', () => setMultiColorVariation(colorSlider.value))
 
 function setMultiColorVariation(position) {
-  // slider position between 1 and 20
+  // https://stackoverflow.com/questions/846221/logarithmic-slider
   let minPosition = 1;
   let maxPosition = 20;
 
-  // result should be between 0.1 and 500
   let minValue = Math.log(0.08);
   let maxValue = Math.log(3);
 
