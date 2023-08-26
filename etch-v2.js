@@ -10,15 +10,21 @@ const colorPickerBg = document.querySelector('.color-pickers .color-bg')
 const lightenBtn = document.querySelector('.button-container .lighten')
 const darkenBtn = document.querySelector('.button-container .darken')
 const eraserBtn = document.querySelector('.button-container .eraser')
+const colorSlider = document.querySelector('.color-slider');
+const sliderDisplay = document.querySelector('.slider-display')
 
 let squares; 
 let mouseTrails = false;
 let mousedown;
 let selectedDrawColor = colorPickerDraw.value;
 let selectedBgColor = colorPickerBg.value;
+let colorVariation;
+setMultiColorVariation(colorSlider.value);
 
 window.addEventListener('mousedown', () => mousedown = true);
 window.addEventListener('mouseup', () => mousedown = false);
+
+sliderDisplay.textContent = `Color variation: ${colorSlider.value}`;
 
 singleColorDrawBtn.addEventListener('click', setSingleColorDraw)
 multiColorDrawBtn.addEventListener('click', setMultiColorDraw)
@@ -29,10 +35,24 @@ clearBtn.addEventListener('click', clearGrid);
 eraserBtn.addEventListener('click', setEraser);
 setGridBtn.addEventListener('click', setGridSize)
 colorPickerDraw.addEventListener('input', () => selectedDrawColor = colorPickerDraw.value);
-colorPickerDraw.addEventListener('change', setSingleColorDraw);
 colorPickerBg.addEventListener('input', updateBgColor);
+colorSlider.addEventListener('input', () => setMultiColorVariation(colorSlider.value))
 
+function setMultiColorVariation(position) {
+  // slider position between 1 and 20
+  let minPosition = 1;
+  let maxPosition = 20;
 
+  // result should be between 0.1 and 500
+  let minValue = Math.log(0.08);
+  let maxValue = Math.log(3);
+
+  let scale = (maxValue - minValue) / (maxPosition - minPosition);
+  let result = Math.exp(minValue + scale * (position - minPosition))
+  sliderDisplay.textContent = `Color variation: ${colorSlider.value}`
+  console.log(result)
+  colorVariation = result;
+};
 
 function updateBgColor() {
   selectedBgColor = colorPickerBg.value;
@@ -68,7 +88,7 @@ function createGrid(width=24) {
     
   }
   squares = document.querySelectorAll('.sq');
-  setSingleColorDraw();
+  setMultiColorDraw();
 };
 
 function setGridSize() {
@@ -89,22 +109,53 @@ function setActiveStyle(btn) {
   btn.classList.add('active')
 }
 
-function getRandomRGB() {
-  let max = 256;
-  let min = 100;
-  // returns a randomly generated RGB value in format: rgb(0 0 255)
-  let r = Math.floor(Math.random() * (max - min) + min);
-  let g = Math.floor(Math.random() * (max - min) + min);
-  let b = Math.floor(Math.random() * (max - min) + min);
-  let result = `rgb(${[r, g, b].join(' ') })`
+function getRandomMulticolor() {
+  let r, g, b;
+  let baseColorRGB;
+  selectedDrawColor[0] === '#' ? baseColorRGB = hexToRGB(selectedDrawColor) : baseColorRGB = parseRGBValues(selectedDrawColor);
+  console.log(baseColorRGB);
+  console.log(colorVariation);
+  let largestValue = Math.max(...baseColorRGB);
+  let largestIdx = baseColorRGB.indexOf(largestValue);
+
+  let newRGBVals = [0, 0, 0]
+
+  for (let idx = 0; idx < 3; idx++) {
+    let min = baseColorRGB[idx] - (baseColorRGB[idx] * colorVariation);
+    let max = baseColorRGB[idx] + (baseColorRGB[idx] * colorVariation);
+
+    if (idx === largestIdx) {
+      min = baseColorRGB[idx] - (baseColorRGB[idx] * colorVariation)
+      max = baseColorRGB[idx] + (baseColorRGB[idx] * colorVariation * 3)
+    };
+    if (min === 0) min = getRandomInRange(0, (colorSlider.value/20) * 256);
+    
+    newRGBVals[idx] = getRandomInRange(min, max);
+  };
+
+  r = newRGBVals[0];
+  g = newRGBVals[1];
+  b = newRGBVals[2];
+
+  let result = `rgb(${[r, g, b].join(' ')})`
+  console.log(result)
   return result;
 };
 
+function getRandomInRange(min, max) {
+  if (max > 256) max = 256;
+  if (min < 0) min = 0;
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
 function parseRGBValues(rgbString) {
-  let r = parseInt(rgbString.split(', ')[0].slice(4));
-  let g = parseInt(rgbString.split(', ')[1]);
-  let b = parseInt(rgbString.split(', ')[2].slice(0).replace(')', ''));
-  return [r, g, b];
+  let r, g, b;
+
+  let splitRGB = rgbString.split(', ');
+  r = parseInt(splitRGB[0].slice(4));
+  g = parseInt(splitRGB[1]);
+  b = parseInt(splitRGB[2].slice(0).replace(')', ''));
+  return [r, g, b]
 }
 
 function hexToRGB(hexValue){
@@ -131,16 +182,16 @@ function lighten(e) {
 
 function darken(e) {
   if (mousedown || e.type === "mousedown") {
-    let currentColorRGB;
+    let currentColorValues;
     let newRGBValues = []
     let currentColor = this.style.backgroundColor;
-    currentColor[0] === '#' ? currentColorRGB = hexToRGB(currentColor) : currentColorRGB = parseRGBValues(currentColor);
+    currentColor[0] === '#' ? currentColorValues = hexToRGB(currentColor) : currentColorValues = parseRGBValues(currentColor);
 
-    for (value of currentColorRGB) {
+    for (value of currentColorValues) {
       if (value < 6) value--; // values less than 6 are unaffected by multiplying by 0.9
       value <= 60 ? newRGBValues.push(value * 0.75) : newRGBValues.push(value * 0.9)
     };
-    this.style.backgroundColor = `rgb(${newRGBValues.join(' ')})`
+    this.style.backgroundColor = `rgb(${newRGBValues.join(', ')})`;
   };
 }
 
@@ -175,7 +226,7 @@ function singleColorIn(e) {
 
 function multiColorIn(e) {
   if (mousedown || e.type === "mousedown") {
-    this.style.backgroundColor = getRandomRGB();
+    this.style.backgroundColor = getRandomMulticolor();
     if (!mouseTrails) this.classList.add('has-changed');
   };
 }

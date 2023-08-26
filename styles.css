@@ -2,11 +2,11 @@
 
 * {
   box-sizing: border-box;
-  --color1: #D9CAB3;
-  --color2: #8C7A6B;
-  --color3: #007369;
-  --color4: #90323D;
-  --color5: #5E0B15;
+  --color1: #ece5df;
+  --color2: #251b13;
+  --color3: #8b013f;
+  --color4: #452b26;
+  --color5: #0F110C;
   font-family: 'Secular One', sans-serif;
 }
 
@@ -52,6 +52,7 @@ button {
   border: none;
   font-size: 1rem;
   color: var(--color1);
+  box-shadow: 0px 0px 3px 1px var(--color4)
 }
 
 button:hover {
@@ -65,7 +66,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  border: 4px solid var(--color1);
+  border: 4px solid var(--color4);
 }
 
 .etch-pad {
@@ -76,6 +77,16 @@ button:hover {
   background-color: var(--color2);
   height: 600px;
   aspect-ratio: 1/1;
+}
+
+.shaders {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.shaders button {
+  flex: 1;
 }
 
 .etch-a-sketch {
@@ -113,3 +124,32 @@ button.set-grid {
   border: 0px solid var(--color1);
 }
 
+.color-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 10px;
+  background: var(--color4);
+  opacity: 0.8;
+}
+
+.color-slider:hover {
+  opacity: 1;
+}
+
+.slider-display {
+  color: var(--color1);
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.color-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height:15px;
+  width: 15px;
+  border-radius: 50%;
+  background-color: var(--color1);
+  cursor: pointer;
+}
